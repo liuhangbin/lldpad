@@ -538,9 +538,9 @@ _set_arg_up2tc(struct cmd *cmd, char *args, const char *arg_value,
 	}
 
 	if (test) {
+		free(parse);
 		if (!is_dcbx_hw(cmd->ifname))
 			return cmd_not_capable;
-		free(parse);
 		return cmd_success;
 	}
 
@@ -655,9 +655,9 @@ _set_arg_tcbw(struct cmd *cmd, char *args, const char *arg_value,
 		err = cmd_invalid;
 		goto invalid;
 	} else if (test) {
+		free(parse);
 		if (!is_dcbx_hw(cmd->ifname))
 			return cmd_not_capable;
-		free(parse);
 		return cmd_success;
 	} else if (tcbw) {
 		memcpy(tcbw, percent, sizeof(*tcbw) * MAX_TCS);
@@ -805,9 +805,9 @@ _set_arg_tsa(struct cmd *cmd, char *args, const char *arg_value,
 	}
 
 	if (test) {
+		free(parse);
 		if (!is_dcbx_hw(cmd->ifname))
 			return cmd_not_capable;
-		free(parse);
 		return cmd_success;
 	}
 
@@ -951,9 +951,9 @@ static int _set_arg_enabled(struct cmd *cmd, char *args,
 	}
 
 	if (test) {
+		free(parse);
 		if (!is_dcbx_hw(cmd->ifname))
 			return cmd_not_capable;
-		free(parse);
 		return cmd_success;
 	}
 
@@ -1121,6 +1121,7 @@ static int get_arg_app(struct cmd *cmd, char *args, UNUSED char *arg_value,
 	const char *app;
 	u8 prio, sel;
 	int proto, hw = -1, i;
+	char *parse;
 
 	if (cmd->cmd != cmd_gettlv)
 		return cmd_invalid;
@@ -1137,7 +1138,7 @@ static int get_arg_app(struct cmd *cmd, char *args, UNUSED char *arg_value,
 	tlvs = ieee8021qaz_data(cmd->ifname);
 	for (i = 0; i < MAX_APP_ENTRIES; i++) {
 		char arg_path[256];
-		char *parse, *app_tuple;
+		char *app_tuple;
 		int err;
 
 		snprintf(arg_path, sizeof(arg_path), "%s%08x.%s%i",
@@ -1191,7 +1192,12 @@ static int get_arg_app(struct cmd *cmd, char *args, UNUSED char *arg_value,
 
 		arg_app_strncat_hw(new_app, hw);
 		strncat(app_buf, new_app, sizeof(app_buf) - strlen(app_buf) - 2);
+
+		free(parse);
 	}
+
+	if (parse)
+		free(parse);
 
 	if (tlvs) {
 		LIST_FOREACH(np, &tlvs->app_head, entry) {
