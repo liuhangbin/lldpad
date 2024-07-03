@@ -629,6 +629,7 @@ static void print_cmd_response(char *ibuf, int status)
 	if (len < sizeof(cmd.ifname)) {
 		memcpy(cmd.ifname, ibuf + CMD_IF, len);
 	} else {
+		memcpy(cmd.ifname, ibuf + CMD_IF, sizeof(cmd.ifname) - 1);
 		printf("Response ifname too long: %*s\n", (int)len, cmd.ifname);
 		return;
 	}
